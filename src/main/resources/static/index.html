@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flexiple Sourcing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#128269;</text></svg>">
+</head>
+<body>
+
+<!-- Shared autocomplete vocabularies, filled from /api/vocabulary -->
+<datalist id="skill-options"></datalist>
+<datalist id="location-options"></datalist>
+
+<!-- ============================= LANDING ============================= -->
+<main id="landing" class="landing">
+    <div class="landing__inner">
+        <p class="eyebrow"><span class="dot"></span>Flexiple &middot; AI sourcing</p>
+        <h1 class="landing__title">Find the right engineers</h1>
+        <p class="landing__lede">
+            Describe who you need and let the AI build the search — or build it yourself, filter by
+            filter. Either way you get a ranked shortlist you can keep refining until it is right.
+        </p>
+
+        <div class="tabs" role="tablist" aria-label="How to start a search">
+            <button type="button" class="tab is-active" role="tab" id="tab-describe"
+                    aria-selected="true" aria-controls="panel-describe">
+                <span class="tab__icon" aria-hidden="true">✧</span> Describe it
+            </button>
+            <button type="button" class="tab" role="tab" id="tab-build"
+                    aria-selected="false" aria-controls="panel-build">
+                <span class="tab__icon" aria-hidden="true">⛃</span> Build it by hand
+            </button>
+        </div>
+
+        <!-- ---- AI entry ---- -->
+        <section id="panel-describe" role="tabpanel" aria-labelledby="tab-describe" class="entry">
+            <form id="search-form" class="search-box" novalidate>
+                <label class="visually-hidden" for="query">Describe the person you are looking for</label>
+                <textarea id="query" name="query" rows="3" maxlength="600" autocomplete="off"
+                          placeholder="RDS developers with 4-7 years of experience who have worked at startups, for a role based in Bangalore."></textarea>
+                <div class="search-box__footer">
+                    <span class="hint"><kbd>Enter</kbd> to search &middot; <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line</span>
+                    <button type="submit" class="btn btn--primary" id="search-button">
+                        Find candidates
+                        <span class="btn__arrow" aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="examples">
+                <span class="examples__label">Try</span>
+                <button type="button" class="example" data-query="RDS developers with 4-7 years of experience who have worked at startups, for a role based in Bangalore.">RDS · 4–7 yrs · Bangalore · startups</button>
+                <button type="button" class="example" data-query="Senior frontend engineers in Bangalore or Remote India who know React and TypeScript and have design system experience.">React · design systems · remote ok</button>
+                <button type="button" class="example" data-query="Machine learning engineers with production LLM and RAG experience, at least 5 years, not from agencies.">ML · LLM/RAG · 5+ yrs</button>
+            </div>
+        </section>
+
+        <!-- ---- Manual entry ---- -->
+        <section id="panel-build" role="tabpanel" aria-labelledby="tab-build" class="entry builder" hidden>
+            <p class="builder__lede">
+                No AI, no waiting. Set the criteria and search the talent map directly — you can hand it
+                to the AI for rubric-based ranking whenever you want.
+            </p>
+
+            <div class="builder__grid">
+                <div class="field">
+                    <label class="field__label" for="build-skills">Skills</label>
+                    <div id="build-skills-chips" class="chips"></div>
+                    <input type="text" class="chip-input" id="build-skills" list="skill-options"
+                           placeholder="Type a skill and press Enter" autocomplete="off">
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="build-locations">Locations</label>
+                    <div id="build-locations-chips" class="chips"></div>
+                    <input type="text" class="chip-input" id="build-locations" list="location-options"
+                           placeholder="Type a location and press Enter" autocomplete="off">
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Experience</span>
+                    <div class="years">
+                        <label class="visually-hidden" for="build-min-years">Minimum years</label>
+                        <input type="number" id="build-min-years" min="0" max="60" placeholder="any">
+                        <span class="years__dash">to</span>
+                        <label class="visually-hidden" for="build-max-years">Maximum years</label>
+                        <input type="number" id="build-max-years" min="0" max="60" placeholder="any">
+                        <span class="years__unit">years</span>
+                    </div>
+                    <div class="presets" id="build-year-presets" role="group" aria-label="Experience presets"></div>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Currently at</span>
+                    <div id="build-company-types" class="toggles" role="group" aria-label="Current company background"></div>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Has ever worked at</span>
+                    <div id="build-past-company-types" class="toggles" role="group" aria-label="Past company background"></div>
+                </div>
+
+                <div class="field">
+                    <label class="checkbox" for="build-skills-all">
+                        <input type="checkbox" id="build-skills-all"> Must have <strong>every</strong> listed skill
+                    </label>
+                    <label class="checkbox" for="build-remote-ok">
+                        <input type="checkbox" id="build-remote-ok"> Remote candidates are acceptable
+                    </label>
+                </div>
+            </div>
+
+            <div class="builder__footer">
+                <p class="builder__count" id="build-count" aria-live="polite"></p>
+                <div class="builder__actions">
+                    <button type="button" class="btn btn--ghost" id="build-reset">Clear</button>
+                    <button type="button" class="btn btn--primary" id="build-submit">
+                        Search the talent map <span class="btn__arrow" aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <p class="landing__status" id="landing-status" aria-live="polite"></p>
+    </div>
+</main>
+
+<!-- ============================= WORKSPACE ============================= -->
+<div id="workspace" class="workspace" hidden>
+
+    <div id="topbar-progress" class="topbar-progress" hidden aria-hidden="true"><span></span></div>
+
+    <header class="topbar">
+        <div class="topbar__left">
+            <span class="brandmark" aria-hidden="true">F</span>
+            <div class="topbar__query">
+                <span class="topbar__label">Sourcing for</span>
+                <p id="topbar-query" class="topbar__text"></p>
+            </div>
+        </div>
+        <div class="topbar__right">
+            <span id="frozen-pill" class="pill pill--frozen" hidden>✓ Search frozen</span>
+            <span id="round-pill" class="pill" hidden></span>
+            <button type="button" id="undo-button" class="btn btn--ghost btn--small" hidden
+                    title="Undo the last refinement (Ctrl+Z)">↶ Undo</button>
+            <button type="button" id="shortcuts-button" class="btn btn--ghost btn--icon"
+                    title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
+            <button type="button" id="freeze-button" class="btn btn--freeze">Freeze search</button>
+            <button type="button" id="restart-button" class="btn btn--ghost">New search</button>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- ---------------------- RESULTS ---------------------- -->
+        <section class="results" aria-labelledby="results-heading">
+            <div id="alert-slot" class="alert-slot" aria-live="assertive"></div>
+
+            <div class="results__head">
+                <div>
+                    <h2 id="results-heading" class="section-title">Candidates</h2>
+                    <p id="results-meta" class="section-meta"></p>
+                </div>
+                <div class="ranking-switch" role="group" aria-label="How to rank the matching profiles">
+                    <button type="button" class="segment" id="rank-local" data-mode="local"
+                            title="Instant, no AI call">Quick rank</button>
+                    <button type="button" class="segment" id="rank-ai" data-mode="ai"
+                            title="Score every candidate against the fit rubric">Rank with AI</button>
+                </div>
+            </div>
+
+            <!-- instant, client-side controls over the matched set -->
+            <div id="toolbar" class="toolbar" hidden>
+                <div class="toolbar__row">
+                    <div class="search-inline">
+                        <span class="search-inline__icon" aria-hidden="true">⌕</span>
+                        <label class="visually-hidden" for="result-search">Search within these candidates</label>
+                        <input type="search" id="result-search" autocomplete="off"
+                               placeholder="Filter by name, title, company or skill…">
+                        <kbd class="search-inline__kbd">/</kbd>
+                    </div>
+                    <label class="visually-hidden" for="sort-select">Sort candidates</label>
+                    <select id="sort-select" class="select">
+                        <option value="score">Best fit first</option>
+                        <option value="years-desc">Most experience</option>
+                        <option value="years-asc">Least experience</option>
+                        <option value="name">Name A–Z</option>
+                        <option value="company">Company A–Z</option>
+                    </select>
+                    <button type="button" id="marked-only" class="chip-toggle" aria-pressed="false">✓ Marked good</button>
+                    <button type="button" id="clear-view" class="btn btn--ghost btn--small" hidden>Clear view filters</button>
+                </div>
+                <div class="toolbar__row toolbar__row--facets">
+                    <div class="facet" id="facet-locations"></div>
+                    <div class="facet" id="facet-company-types"></div>
+                </div>
+            </div>
+
+            <!-- staged loading -->
+            <div id="loading-panel" class="loading" aria-live="polite" hidden>
+                <ol id="loading-steps" class="steps"></ol>
+                <div class="skeletons" aria-hidden="true">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+
+            <!-- no profiles pass the objective filters -->
+            <div id="empty-panel" class="empty" hidden>
+                <div class="empty__icon" aria-hidden="true">⌕</div>
+                <h3>No candidates match these filters</h3>
+                <p class="empty__lede">Your objective filters are ruling everyone out. Here is what each one keeps on its own — the tightest is highlighted.</p>
+                <ul id="empty-diagnostics" class="diagnostics"></ul>
+                <p class="empty__hint">Loosen one on the right, or tell the assistant what to relax.</p>
+            </div>
+
+            <!-- profiles matched, but the view filters hide them all -->
+            <div id="no-view-matches" class="empty empty--soft" hidden>
+                <div class="empty__icon" aria-hidden="true">⌕</div>
+                <h3>Nothing matches what you typed</h3>
+                <p class="empty__lede" id="no-view-matches-detail"></p>
+                <button type="button" class="btn btn--ghost btn--small" id="clear-view-empty">Clear view filters</button>
+            </div>
+
+            <div id="candidate-list" class="cards"></div>
+
+            <button type="button" id="show-all-button" class="btn btn--ghost btn--wide" hidden></button>
+        </section>
+
+        <!-- ---------------------- SIDE RAIL ---------------------- -->
+        <aside class="rail" aria-label="Current search definition">
+
+            <section class="panel" aria-labelledby="filters-heading">
+                <header class="panel__head">
+                    <h2 id="filters-heading" class="section-title">Objective filters</h2>
+                    <span id="filters-origin" class="tag"></span>
+                </header>
+                <p class="panel__note">A hard gate, applied in code against all <span id="pool-size">48</span> profiles.</p>
+
+                <div class="field">
+                    <span class="field__label">Experience</span>
+                    <div class="years">
+                        <label class="visually-hidden" for="min-years">Minimum years of experience</label>
+                        <input type="number" id="min-years" min="0" max="60" inputmode="numeric" placeholder="any">
+                        <span class="years__dash">to</span>
+                        <label class="visually-hidden" for="max-years">Maximum years of experience</label>
+                        <input type="number" id="max-years" min="0" max="60" inputmode="numeric" placeholder="any">
+                        <span class="years__unit">years</span>
+                    </div>
+                    <div class="presets" id="year-presets" role="group" aria-label="Experience presets"></div>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="skills-input">Skills</label>
+                    <div id="skills-chips" class="chips"></div>
+                    <input type="text" class="chip-input" id="skills-input" list="skill-options"
+                           placeholder="Add a skill and press Enter" autocomplete="off">
+                    <label class="checkbox" for="skills-all">
+                        <input type="checkbox" id="skills-all"> Must have every listed skill
+                    </label>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="locations-input">Locations</label>
+                    <div id="locations-chips" class="chips"></div>
+                    <input type="text" class="chip-input" id="locations-input" list="location-options"
+                           placeholder="Add a location and press Enter" autocomplete="off">
+                    <label class="checkbox" for="remote-ok">
+                        <input type="checkbox" id="remote-ok"> Remote candidates are acceptable
+                    </label>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Currently at</span>
+                    <div id="company-types" class="toggles" role="group" aria-label="Current company background"></div>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Has ever worked at</span>
+                    <div id="past-company-types" class="toggles" role="group" aria-label="Past company background"></div>
+                </div>
+
+                <div class="field">
+                    <span class="field__label">Rule out currently at</span>
+                    <div id="exclude-company-types" class="toggles toggles--exclude" role="group" aria-label="Excluded company background"></div>
+                </div>
+            </section>
+
+            <section class="panel" aria-labelledby="rubric-heading">
+                <header class="panel__head">
+                    <h2 id="rubric-heading" class="section-title">Fit rubric</h2>
+                    <span id="rubric-origin" class="tag"></span>
+                </header>
+                <p class="panel__note">Soft preferences. These re-rank candidates; they never remove them.</p>
+                <textarea id="rubric-summary" class="rubric-summary" rows="2"
+                          aria-label="What an excellent candidate looks like"></textarea>
+                <div id="rubric-criteria" class="criteria"></div>
+                <button type="button" id="add-criterion" class="btn btn--ghost btn--small btn--wide">+ Add a criterion</button>
+            </section>
+
+            <div id="filters-actions" class="apply-bar" hidden>
+                <div class="apply-bar__text">
+                    <strong id="apply-summary">Unapplied changes</strong>
+                    <span class="hint">Re-runs the search with your edited filters and rubric.</span>
+                </div>
+                <div class="apply-bar__actions">
+                    <button type="button" id="reset-button" class="btn btn--ghost btn--small">Discard</button>
+                    <button type="button" id="apply-button" class="btn btn--primary btn--small">Apply changes</button>
+                </div>
+            </div>
+
+            <section class="panel panel--chat" aria-labelledby="chat-heading">
+                <header class="panel__head">
+                    <h2 id="chat-heading" class="section-title">Refine in conversation</h2>
+                </header>
+                <div id="history" class="history"></div>
+                <form id="feedback-form" class="composer">
+                    <label class="visually-hidden" for="feedback">Tell the assistant what you think</label>
+                    <textarea id="feedback" rows="3" maxlength="1000"
+                              placeholder="1 is too junior, 2 and 4 are right. I want stronger startup experience."></textarea>
+                    <div class="composer__quick" id="quick-feedback"></div>
+                    <div class="composer__footer">
+                        <span id="verdict-summary" class="hint"></span>
+                        <button type="submit" id="refine-button" class="btn btn--primary btn--small">Refine search</button>
+                    </div>
+                </form>
+            </section>
+        </aside>
+    </div>
+
+    <!-- ---------------------- FROZEN SUMMARY ---------------------- -->
+    <section id="frozen-summary" class="frozen" hidden aria-labelledby="frozen-heading">
+        <div class="frozen__inner">
+            <header class="frozen__head">
+                <div>
+                    <h2 id="frozen-heading">✓ Search frozen</h2>
+                    <p id="frozen-stats"></p>
+                </div>
+                <div class="frozen__actions">
+                    <button type="button" id="copy-shortlist" class="btn btn--ghost btn--small">Copy shortlist</button>
+                    <button type="button" id="download-shortlist" class="btn btn--ghost btn--small">Download CSV</button>
+                </div>
+            </header>
+            <div class="frozen__grid">
+                <div>
+                    <h3 class="section-title">Final shortlist</h3>
+                    <ol id="frozen-shortlist" class="shortlist"></ol>
+                </div>
+                <div>
+                    <h3 class="section-title">Objective filters</h3>
+                    <dl id="frozen-filters" class="definition"></dl>
+                    <h3 class="section-title">Fit rubric</h3>
+                    <div id="frozen-rubric" class="frozen__rubric"></div>
+                    <h3 class="section-title">How this search evolved</h3>
+                    <ol id="frozen-history" class="timeline"></ol>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================= DIALOGS ============================= -->
+<dialog id="freeze-dialog" class="dialog">
+    <h2>Freeze this search?</h2>
+    <p>The filters, the rubric and the ranked shortlist become final. You will not be able to refine
+        this search again.</p>
+    <div class="dialog__actions">
+        <button type="button" id="freeze-cancel" class="btn btn--ghost">Keep refining</button>
+        <button type="button" id="freeze-confirm" class="btn btn--freeze">Freeze search</button>
+    </div>
+</dialog>
+
+<dialog id="shortcuts-dialog" class="dialog dialog--wide">
+    <h2>Keyboard shortcuts</h2>
+    <dl class="shortcuts">
+        <dt><kbd>/</kbd></dt><dd>Filter the candidates on screen</dd>
+        <dt><kbd>j</kbd> <kbd>k</kbd></dt><dd>Move between candidates</dd>
+        <dt><kbd>y</kbd> <kbd>n</kbd></dt><dd>Mark the selected candidate good or not</dd>
+        <dt><kbd>e</kbd></dt><dd>Expand or collapse the selected candidate</dd>
+        <dt><kbd>c</kbd></dt><dd>Jump to the feedback box</dd>
+        <dt><kbd>Ctrl</kbd>+<kbd>Enter</kbd></dt><dd>Send feedback and refine</dd>
+        <dt><kbd>Ctrl</kbd>+<kbd>Z</kbd></dt><dd>Undo the last refinement</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Clear the view filters</dd>
+        <dt><kbd>?</kbd></dt><dd>This list</dd>
+    </dl>
+    <div class="dialog__actions">
+        <button type="button" id="shortcuts-close" class="btn btn--ghost">Close</button>
+    </div>
+</dialog>
+
+<div id="toast-slot" class="toast-slot" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+A recruiter has described who they are looking for, in their own words:
+
+"""
+{{query}}
+"""
+
+Turn that into two things: objective filters the system can apply mechanically, and a subjective fit
+rubric that captures what an excellent candidate looks like for this role.
+
+CONTEXT ABOUT THE TALENT POOL
+
+Locations that exist in the data:
+{{known_locations}}
+
+Skills that exist in the data (use these spellings wherever the recruiter means one of them):
+{{known_skills}}
+
+Company backgrounds are exactly these four values: startup, scaleup, enterprise, agency.
+
+HOW TO WRITE THE OBJECTIVE FILTERS
+
+- skills: only concrete, checkable technologies or tools the recruiter actually asked for. If they
+  said "RDS", use the pool's spelling "AWS RDS". Do not pad the list with adjacent technologies the
+  recruiter did not mention; two or three precise skills beat eight speculative ones.
+- skills_match_all: true only if the recruiter clearly requires every skill. Default to false.
+- min_years_experience / max_years_experience: always return both fields. If the recruiter gave a
+  range or a bound, encode it exactly: "4-7 years" is min 4 and max 7; "at least 5" is min 5 and max
+  null; "up to 3" is min null and max 3. Only use null for a bound the recruiter did not give.
+  Never silently drop a stated range. "Senior" on its own is not a number - leave both null and put
+  the seniority expectation in the rubric instead.
+- locations: the city or region for the role. Omit entirely if the recruiter did not name one.
+- remote_ok: true only if the recruiter said remote is acceptable.
+- company_types: the background the recruiter wants the candidate to be in right now.
+- past_company_types: use this when the recruiter says "has worked at", "has experience at" or
+  "background in" rather than "currently at". Saying someone "has worked at startups" is usually a
+  past_company_types requirement, not a current one - but if in doubt, prefer past_company_types
+  because it is the more forgiving of the two.
+- exclude_company_types: only when the recruiter explicitly rules a background out.
+
+Be deliberately generous with objective filters. They are a hard gate: anything you add here removes
+people permanently. Preferences, seniority feel, domain flavour and anything with a "prefer",
+"ideally" or "strong" in it belongs in the rubric, not in the filters.
+
+HOW TO WRITE THE FIT RUBRIC
+
+- summary: one or two sentences describing the ideal person for this specific role.
+- criteria: between three and five, each with a short name, a concrete description of what excellent
+  looks like, and a weight between 0 and 1. Weights should sum to roughly 1.
+- Cover what the recruiter cares about that a filter cannot check: depth versus breadth, ownership,
+  domain, environment, trajectory, seniority.
+- Do not restate a filter as a criterion unless there is real judgement in it. "Lives in Bangalore"
+  is a filter. "Has run production databases they were on call for" is a rubric criterion.

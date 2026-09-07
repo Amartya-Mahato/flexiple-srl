@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: flexiple-sourcing
+  jackson:
+    # profiles.json, the model's JSON and our own API all speak snake_case; Java stays camelCase.
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+    deserialization:
+      # A model that omits an optional boolean should mean "false", not fail the whole response.
+      fail-on-null-for-primitives: false
+  web:
+    resources:
+      chain:
+        cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+llm:
+  api-key: ${LLM_API_KEY:}
+  model: ${LLM_MODEL:gemini-3.6-flash}
+  base-url: ${LLM_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+  timeout-seconds: ${LLM_TIMEOUT_SECONDS:60}
+
+app:
+  profiles-file: ${PROFILES_FILE:./profiles.json}
+
+logging:
+  level:
+    com.flexiple.sourcing: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{28} - %msg%n"

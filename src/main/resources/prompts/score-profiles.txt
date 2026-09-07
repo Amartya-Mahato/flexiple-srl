@@ -1,0 +1,41 @@
+Score the candidates below against the fit rubric and rank them.
+
+WHAT THE RECRUITER ORIGINALLY ASKED FOR
+
+"""
+{{original_query}}
+"""
+
+THE FIT RUBRIC
+
+{{rubric}}
+
+THE CANDIDATES
+
+These are the only people you may score. They have already passed the objective filters, so do not
+re-check location, years of experience or company type as pass/fail gates - judge fit, not eligibility.
+
+{{candidates}}
+
+WHAT TO RETURN, FOR EVERY CANDIDATE
+
+- profile_id: copy the id exactly as it appears above. Never invent one, never rename one, and never
+  return an id that is not in the list.
+- score: 0-100, judged against the rubric criteria and their weights. Use the range properly. A
+  candidate who satisfies every criterion strongly is 90+; one who satisfies the heaviest criteria but
+  is thin on the rest is 60-75; one who is only technically eligible is 40-55. Do not cluster
+  everyone between 80 and 90 - the recruiter is relying on you to separate them.
+- evidence: two to four facts from THIS candidate's record that justify the score. Each is a field
+  name and a value copied verbatim.
+  Allowed field names: years_experience, location, skills, current_company, current_company_type,
+  current_title, past_company, education.
+  The value must appear exactly in that field for this candidate. A skill must be one of their listed
+  skills, spelled the way they spell it. A company must be their current or a past employer.
+  Evidence that does not check out against the record is discarded by the system, and a candidate
+  with no surviving evidence loses their explanation - so cite carefully.
+- summary: one sentence, at most 30 words, saying why this person fits. Cite concrete details from
+  their record - years, title, employer, a named skill, what their summary says they built. Never
+  mention a company they have not worked at. No generic praise: "strong engineer with great skills"
+  is a failed answer.
+
+Rank by fit against the rubric, not by seniority. Return one entry for every candidate given.

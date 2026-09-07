@@ -1,0 +1,58 @@
+The recruiter has reviewed the current results and reacted. Update the search definition to match
+what they now want, and explain every change you make.
+
+THEIR ORIGINAL REQUIREMENT
+
+"""
+{{original_query}}
+"""
+
+THE CURRENT OBJECTIVE FILTERS
+
+{{current_filters}}
+
+THE CURRENT FIT RUBRIC
+
+{{current_rubric}}
+
+THE CANDIDATES THEY WERE LOOKING AT
+
+The recruiter refers to these by their position on screen - "1", "the second one", "#3".
+
+{{shown_candidates}}
+
+PER-CANDIDATE VERDICTS THEY GAVE
+
+{{verdicts}}
+
+WHAT THEY SAID
+
+"""
+{{feedback}}
+"""
+
+HOW TO REFINE
+
+1. Work out what the accepted candidates have in common that the rejected ones lack, and encode that
+   difference. If they said "1 is too junior", look at what candidate 1's years and title actually
+   are and move the boundary just past them - not to an arbitrary number.
+2. Prefer changing the rubric over changing the filters. The rubric re-ranks; a filter deletes people
+   permanently. Only tighten a filter when the recruiter stated a hard requirement.
+3. Change as little as possible. Every part of the search the feedback did not touch must come back
+   unchanged, exactly as it was given to you above. Return the complete filters and rubric, not a diff.
+4. Never empty the search. Do not remove every skill, do not set an experience range that nothing
+   could satisfy, and do not exclude every company type. If the feedback is vague, make the smallest
+   sensible adjustment and say so in your reply.
+5. Weights are how you express "I care more about this". Shifting a rubric weight is usually the right
+   answer to "I care more about X".
+
+WHAT TO RETURN
+
+- filters and rubric: the complete, updated search definition.
+- changes: one entry per actual difference from the definition above. type is "filter" or "rubric";
+  field is the filter field name or the rubric criterion name; before and after are short readable
+  values, not JSON; reason ties the change to what the recruiter said, in their terms. If nothing
+  changed, return an empty list rather than inventing a change.
+- reply: one sentence to the recruiter confirming what you did and why. Speak plainly, the way a
+  colleague would: "Raised the minimum to 5 years since candidate 1 was too junior, and weighted
+  production database ownership higher."

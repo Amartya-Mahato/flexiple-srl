@@ -1,0 +1,20 @@
+# Build output
+target/
+*.class
+
+# Secrets - never commit an API key
+.env
+.env.*
+*.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
