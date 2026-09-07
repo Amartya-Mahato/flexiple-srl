@@ -459,5 +459,3 @@ model quietly dropped them and a stated "4–7 years" silently stopped being par
 - **The recruiter's own edits are never presented as the AI's work.** Manual edits are tagged
   `Edited by you`, recorded as their own round in the history, and diffed in Java so hand edits are
   explained the same way AI ones are.
-#   f l e x i p l e - s r l  
- 
